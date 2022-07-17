@@ -1,0 +1,17 @@
+name: Dismine
+version: '${project.version}'
+main: de.creelone.dismine.Dismine
+api-version: 1.19
+commands:
+  shrug:
+    description: "¯\_(ツ)_/¯"
+  tableflip:
+    description: "(╯°□°）╯︵ ┻━┻"
+  unflip:
+    description: "┬─┬ ノ( ゜-゜ノ)"
+  doubleflip:
+    description: "┻━┻彡 ヽ(ಠ益ಠ)ノ彡┻━┻"
+  owo:
+    description: "\\(OwO)/"
+  sync:
+    description: "Sync with your discord account"

@@ -1,6 +1,7 @@
 package de.creelone.dismine;
 
 import de.creelone.dismine.Dismine.MessageSource;
+import de.creelone.dismine.cmds.SyncCommand;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
@@ -16,6 +17,8 @@ import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandException;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -30,107 +33,125 @@ public class DiscordStuff implements Runnable {
 		SAY  ("[",  "]"),
 		OTHER("**", "**");
 
-		String pre;
-		String suf;
+		final String pre;
+		final String suf;
 
-		private MessageType(String pre, String suf) {
+		MessageType(String pre, String suf) {
 			this.pre = pre;
 			this.suf = suf;
 		}
 	}
+	private static GatewayDiscordClient gateway;
+	private static boolean ready = false;
+	public final static ArrayList<String> msgQueue;
+	public final static ArrayList<String> logQueue;
 
-	private Dismine bridge;
-	private DiscordClient client;
-	private GatewayDiscordClient gateway;
-	private boolean ready = false;
-	public final ArrayList<String> msgQueue;
-	private static DiscordStuff instance;
+	static {
+		msgQueue = new ArrayList<>();
+		logQueue = new ArrayList<>();
+	}
 
 	private DiscordStuff() {
-		this.bridge = Dismine.instance;
-		msgQueue = new ArrayList<>();
+
 	}
 
-	public static DiscordStuff getInstance() {
-		if(instance == null) instance = new DiscordStuff();
-		return instance;
-	}
-
-	public void login() {
-		new Thread(this, "DiscordStuff").start();
+	public static void login() {
+		if (ready) return;
+		new Thread(new DiscordStuff(), "DiscordStuff").start();
 	}
 
 	@Override
 	public void run() {
-		bridge.getServer().getLogger().log(Level.INFO, "[DismineBridge] Logging in...");
-		client = DiscordClient.create(bridge.TOKEN);
+		Dismine.instance.getServer().getLogger().log(Level.INFO, "[DismineBridge] Logging in...");
+		var client = DiscordClient.create(Config.DC_TOKEN);
 		var bootstrap = client.gateway();
 		bootstrap.setEnabledIntents(IntentSet.of(Intent.GUILD_MEMBERS, Intent.GUILD_MESSAGES));
-		this.gateway = bootstrap.login().block();
+		gateway = bootstrap.login().block();
 
-		var onReady = gateway.on(ReadyEvent.class, event -> Mono.fromRunnable(() -> {
-			final User self = event.getSelf();
-			bridge.getServer().getLogger().log(Level.FINE, String.format("[DismineBridge] Logged in as %s#%s", self.getUsername(), self.getDiscriminator()));
+		try {
+			var onReady = gateway.on(ReadyEvent.class, event -> Mono.fromRunnable(() -> {
+				final User self = event.getSelf();
+				Dismine.instance.getServer().getLogger().log(Level.FINE, String.format("[DismineBridge] Logged in as %s#%s", self.getUsername(), self.getDiscriminator()));
 
-			this.ready = true;
-			purgeMsgQueue();
-		})).subscribe();
-		var onMessageCreate = gateway.on(MessageCreateEvent.class, event -> {
-			Message message = event.getMessage();
-			User author = message.getAuthor().get();
-			if (author.isBot()) return Mono.empty();
-			String content = message.getContent();
-			String authortag = author.getTag();
-			Member member = message.getAuthorAsMember().block();
-			String name = "";
-			try {
-				name = member.getMemberData().nick().get().get();
-			} catch (NoSuchElementException e) {
-				name = author.getUsername();
-			}
-			int accentColor;
-			try {
-				var c = author.getAccentColor().get();
-				accentColor = c.getRGB();
-			} catch (NoSuchElementException e) {
-				accentColor = 0xffffff;
-			}
-			var color = member.asFullMember().block().getColor().block().getRGB();
-			if (color == 0x000000) color = accentColor;
+				ready = true;
+				purgeLogQueue();
+				purgeMsgQueue();
+			})).subscribe();
+			var onMessageCreate = gateway.on(MessageCreateEvent.class, event -> {
+				Message message = event.getMessage();
+				if (!message.getAuthor().isPresent()) return Mono.empty();
+				User author = message.getAuthor().get();
+				if (author.isBot()) return Mono.empty();
 
-			var comp = Component.text(name).color(TextColor.color(color));
-
-			bridge.getServer().sendMessage(bridge.createChatMsg(MessageSource.DISCORD, Dismine.getIdentityByDcid(author.getId()), comp, content));
-
-			return Mono.empty();
-		}).subscribe();
-		var onBtnInteraction = gateway.on(ButtonInteractionEvent.class, event -> {
-			if(event.getCustomId().startsWith("sync") || event.getCustomId().startsWith("notme")) {
-				SyncCommand.button(event);
-			}
-			return Mono.empty();
-		}).subscribe();
+				//Dismine.instance.getLogger().log(Level.INFO, String.format("%s vs. %s, %s", message.getChannelId().asString(), Config.DC_CHANNEL_CHAT.asString(), Config.DC_CHANNEL_CONSOLE.asString()));
+				if (message.getChannelId().asString().equals(Config.DC_CHANNEL_CHAT.asString())) onMsg(message, author);
+				else if (message.getChannelId().asString().equals(Config.DC_CHANNEL_CONSOLE.asString())) onConsoleInput(message, author);
+				return Mono.empty();
+			}).subscribe();
+			var onBtnInteraction = gateway.on(ButtonInteractionEvent.class, event -> {
+				if(event.getCustomId().startsWith("sync") || event.getCustomId().startsWith("notme")) {
+					SyncCommand.button(event);
+				}
+				return Mono.empty();
+			}).subscribe();
+		} catch (NullPointerException ignore) {}
 	}
 
-	public void sendMessage(String content) {
-		if (!this.ready) {
+	private static void onMsg(Message message, User author) {
+		String content = message.getContent();
+		String authortag = author.getTag();
+		Member member = message.getAuthorAsMember().block();
+		String name = "";
+		try {
+			name = member.getMemberData().nick().get().get();
+		} catch (NoSuchElementException e) {
+			name = author.getUsername();
+		} catch (NullPointerException ignore) {}
+		int accentColor;
+		try {
+			var c = author.getAccentColor().get();
+			accentColor = c.getRGB();
+		} catch (NoSuchElementException e) {
+			accentColor = 0xffffff;
+		}
+		var color = member.asFullMember().block().getColor().block().getRGB();
+		if (color == 0x000000) color = accentColor;
+
+		var comp = Component.text(name).color(TextColor.color(color));
+
+		Dismine.instance.getServer().sendMessage(Dismine.instance.createChatMsg(MessageSource.DISCORD, Dismine.getIdentityByDcid(author.getId()), comp, content));
+	}
+
+	private static void onConsoleInput(Message message, User author) {
+		String content = message.getContent();
+		String authorid = author.getId().asString();
+		Dismine.instance.getLogger().log(Level.INFO, "> " + content);
+		/*Dismine.instance.getLogger().log(Level.INFO, Config.DC_OPERATORS.toString());
+		Dismine.instance.getLogger().log(Level.INFO, authorid);*/
+		if (!Config.DC_OPERATORS.contains(authorid)) return;
+
+		Dismine.queueCommand(content);
+	}
+
+	public static void sendMessage(String content) {
+		if (!ready) {
 			msgQueue.add(content);
 			return;
 		}
 		content = MsgConverter.convertToDC(content);
-		Channel channel = gateway.getChannelById(bridge.CHANNEL_ID).block();
+		Channel channel = gateway.getChannelById(Config.DC_CHANNEL_CHAT).block();
 		channel.getRestChannel().createMessage(content).block();
 	}
 
-	public void sendMessage(String format, Object ...args) {
+	public static void sendMessage(String format, Object ...args) {
 		sendMessage(String.format(format, args));
 	}
 
-	public void sendMessage(String icon, String name, MessageType type, String format, Object... args) {
+	public static void sendMessage(String icon, String name, MessageType type, String format, Object... args) {
 		sendMessage("%s %s%s%s %s", icon, type.pre, name, type.suf, String.format(format, args));
 	}
 
-	public void sendMessage(String icon, Identity identity, MessageType type, String format, Object... args) {
+	public static void sendMessage(String icon, Identity identity, MessageType type, String format, Object... args) {
 		var prefix = identity.getTeamPrefixString().replaceAll("§.","");
 		var suffix = identity.getTeamSuffixString().replaceAll("§.","");
 		var name = identity.getPlayerName();
@@ -138,15 +159,26 @@ public class DiscordStuff implements Runnable {
 		sendMessage(icon, prefix + name + suffix, type, String.format(format, args));
 	}
 
-	public void sendMessage(MessageSource src, Identity identity, MessageType type, String format, Object... args) {
+	public static void sendMessage(MessageSource src, Identity identity, MessageType type, String format, Object... args) {
 		sendMessage(src.dcicon, identity, type, String.format(format, args));
 	}
 
-	public User getUser(String tag) {
+	public static void sendLogMessage(String content) {
+		if (!ready) {
+			logQueue.add(content);
+			return;
+		}
+		content = content.replace("\\","\\\\");
+		content = content.replaceAll("\u007F.", ""); // apparently, Bukkit/Spigot/Paper use ASCII DEL as §
+		Channel channel = gateway.getChannelById(Config.DC_CHANNEL_CONSOLE).block();
+		channel.getRestChannel().createMessage(content).block();
+	}
+
+	public static User getUser(String tag) {
 		var users = gateway.getUsers().collectList().block();
 
 		for (User u : users) {
-			bridge.getServer().getLogger().log(Level.INFO, u.getTag(), tag);
+			Dismine.instance.getServer().getLogger().log(Level.INFO, u.getTag(), tag);
 			if (u.getTag().equals(tag)) {
 				return u;
 			}
@@ -155,8 +187,8 @@ public class DiscordStuff implements Runnable {
 		return null;
 	}
 
-	public boolean sendMessageTo(User user, String content, ActionRow row) {
-		if (!this.ready) return false;
+	public static boolean sendMessageTo(User user, String content, ActionRow row) {
+		if (!ready) return false;
 		if (user == null) return false;
 
 		var builder = MessageCreateSpec.builder();
@@ -170,51 +202,52 @@ public class DiscordStuff implements Runnable {
 		return true;
 	}
 
-    /*public void sendMessage(String content, String emoji) {
-        sendPlainMessage(String.format("%s %s", emoji, content));
-    }
-
-    public void sendMessage(Player player, String content) {
-        sendMessage(String.format("**%s:** %s", player.getName(), content), "<:mcjava:997587410571501708>");
-    }
-
-    public void sendDeathMessage(Player player) {
-        sendMessage(String.format("**%s %s and lost %s XP**", player.getName(), content), ":skull:");
-    }
-
-    public void sendJoinMessage(Player player, String content) {
-        sendMessage(player, content, ":arrow_right:", false);
-    }
-
-    public void sendLeaveMessage(Player player, String content) {
-        sendMessage(player, content, ":arrow_right:", false);
-    }*/
-
-	private void purgeMsgQueue() {
+	private static void purgeMsgQueue() {
+		String combined = "";
 		for (String s : msgQueue) {
-			sendMessage(s);
+			if (combined.length() + s.length() + 1 <= 2000) {
+				combined += s + "\n";
+				continue;
+			}
+			if (combined.endsWith("\n")) combined = combined.substring(0, combined.length() -1);
+			sendMessage(combined);
 		}
+		if (combined.endsWith("\n")) combined = combined.substring(0, combined.length() -1);
+		if (combined.length() > 0) sendMessage(combined);
 		msgQueue.clear();
 	}
 
-	public void logout() {
-		this.ready = false;
-		var gateway = this.gateway;
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				bridge.getServer().getLogger().log(Level.INFO, "[DismineBridge] Logging out...");
-				gateway.logout().subscribe();
+	private static void purgeLogQueue() {
+		String combined = "";
+		for (String s : logQueue) {
+			if (combined.length() + s.length() + 1 <= 2000) {
+				combined += s + "\n";
+				continue;
 			}
-		}, "GatewayKiller").start();
-		this.gateway = null;
+			if (combined.endsWith("\n")) combined = combined.substring(0, combined.length() -1);
+			sendLogMessage(combined);
+		}
+		if (combined.endsWith("\n")) combined = combined.substring(0, combined.length() -1);
+		if (combined.length() > 0) sendLogMessage(combined);
+		logQueue.clear();
 	}
 
-	public GatewayDiscordClient getGateway() {
+	public static void logout() {
+		if (!ready) return;
+		ready = false;
+		var gateway = getGateway();
+		new Thread(() -> {
+			Dismine.instance.getServer().getLogger().log(Level.INFO, "[DismineBridge] Logging out...");
+			gateway.logout().subscribe();
+		}, "GatewayKiller").start();
+		DiscordStuff.gateway = null;
+	}
+
+	public static GatewayDiscordClient getGateway() {
 		return gateway;
 	}
 
-	public boolean isReady() {
+	public static boolean isReady() {
 		return ready;
 	}
 

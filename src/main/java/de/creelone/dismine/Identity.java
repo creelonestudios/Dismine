@@ -15,15 +15,13 @@ import java.util.UUID;
 
 public class Identity {
 
-	private Snowflake dcid;
-	private UUID uuid;
-	private boolean synced;
-	private DiscordStuff dc;
+	private final Snowflake dcid;
+	private final UUID uuid;
+	private final boolean synced;
 
-	Identity(Snowflake dcid, UUID uuid) {
+	public Identity(Snowflake dcid, UUID uuid) {
 		this.dcid = dcid;
 		this.uuid = uuid;
-		this.dc = DiscordStuff.getInstance();
 		this.synced = dcid != null && uuid != null;
 	}
 
@@ -36,8 +34,8 @@ public class Identity {
 	}
 
 	public User getUser() {
-		if (!dc.isReady() || this.dcid == null) return null;
-		var gateway = dc.getGateway();
+		if (!DiscordStuff.isReady() || this.dcid == null) return null;
+		var gateway = DiscordStuff.getGateway();
 		return gateway.getUserById(dcid).block();
 	}
 
@@ -57,6 +55,7 @@ public class Identity {
 		var user = this.getUser();
 		if (user == null) return 0xffffff;
 		try {
+			if (user.getAccentColor().isEmpty()) return 0xffffff;
 			return user.getAccentColor().get().getRGB();
 		} catch (NoSuchElementException e) {
 			return 0xffffff;
@@ -82,16 +81,14 @@ public class Identity {
 		var player = getPlayer();
 		if (player == null) return null;
 		Scoreboard board = Dismine.instance.getServer().getScoreboardManager().getMainScoreboard();
-		var team = board.getPlayerTeam(player);
-		if (team == null) return null;
-		return team;
+		return board.getPlayerTeam(player);
 	}
 
 	public Component getTeamPrefix() {
 		var team = getTeam();
 		if (team == null) return Component.empty();
 		var prefix = team.prefix();
-		prefix.colorIfAbsent(getTeamColor());
+		prefix = prefix.colorIfAbsent(getTeamColor());
 		return prefix;
 	}
 
@@ -99,7 +96,7 @@ public class Identity {
 		var team = getTeam();
 		if (team == null) return Component.empty();
 		var suffix = team.suffix();
-		if (suffix.color() == null) suffix.colorIfAbsent(getTeamColor());
+		suffix = suffix.colorIfAbsent(getTeamColor());
 		return suffix;
 	}
 

@@ -13,13 +13,7 @@ import de.creelone.dismine.DiscordStuff.MessageType;
 
 public class Events implements Listener {
 
-	private Dismine bridge;
-	private DiscordStuff dc;
-
-	public Events(Dismine bridge, DiscordStuff dc) {
-		this.bridge = bridge;
-		this.dc = dc;
-	}
+	public Events() {}
 
 	@EventHandler
 	public void onChat(AsyncChatEvent e) {
@@ -27,10 +21,10 @@ public class Events implements Listener {
 		var identity = Dismine.getIdentityByUuid(e.getPlayer().getUniqueId());
 		//dcstuff.sendMessage("<:mcjava:997587410571501708> " + e.getPlayer().getName() + ": " + e.getMessage()); identity.getPlayerDisplayName()
 		//dc.sendMessage("%s **%s:** %s", "<:mcjava:997587410571501708>", e.getPlayer().getName(), msg.replace("\\", "\\\\"));
-		var comp = bridge.createChatMsg(MessageSource.MCJAVA, identity, identity.getPlayerDisplayName(), msg);
-		bridge.getServer().sendMessage(comp);
+		var comp = Dismine.instance.createChatMsg(MessageSource.MCJAVA, identity, identity.getPlayerDisplayName(), msg);
+		Dismine.instance.getServer().sendMessage(comp);
 		e.setCancelled(true);
-		dc.sendMessage(MessageSource.MCJAVA, identity, MessageType.CHAT, "%s", msg);
+		DiscordStuff.sendMessage(MessageSource.MCJAVA, identity, MessageType.CHAT, "%s", msg);
 	}
 
 	@EventHandler
@@ -39,21 +33,21 @@ public class Events implements Listener {
 		var identity = Dismine.getIdentityByUuid(e.getPlayer().getUniqueId());
 		var deathMsg = e.getDeathMessage();
 		deathMsg = deathMsg.substring(identity.getTeamPrefixString().length() + identity.getPlayerName().length() + identity.getTeamSuffixString().length() + 1);
-		dc.sendMessage(":skull:", identity, MessageType.OTHER, "**%s and lost %s XP**", deathMsg, e.getPlayer().getTotalExperience() - e.getNewTotalExp());
+		DiscordStuff.sendMessage(":skull:", identity, MessageType.OTHER, "**%s and lost %s XP**", deathMsg, e.getPlayer().getTotalExperience() - e.getNewTotalExp());
 	}
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		//dc.sendMessage("%s **%s joined the game**", ":arrow_right:", e.getPlayer().getName());
 		var identity = Dismine.getIdentityByUuid(e.getPlayer().getUniqueId());
-		dc.sendMessage(":arrow_right:", identity, MessageType.OTHER, "**joined the game**");
+		DiscordStuff.sendMessage(":arrow_right:", identity, MessageType.OTHER, "**joined the game**");
 	}
 
 	@EventHandler
 	public void onLeave(PlayerQuitEvent e) {
 		//dc.sendMessage("%s **%s left the game**", ":arrow_left:", e.getPlayer().getName());
 		var identity = Dismine.getIdentityByUuid(e.getPlayer().getUniqueId());
-		dc.sendMessage(":arrow_left:", identity, MessageType.OTHER, "**left the game**");
+		DiscordStuff.sendMessage(":arrow_left:", identity, MessageType.OTHER, "**left the game**");
 	}
 
 	@EventHandler
@@ -62,7 +56,7 @@ public class Events implements Listener {
 		boolean isChallenge = PlainTextComponentSerializer.plainText().serialize(e.message()).contains("completed the challenge");
 		//dc.sendMessage("%s **%s has %s** [%s]", isChallenge ? ":dart:" : ":trophy:", e.getPlayer().getName(), isChallenge ? "completed the challenge" : "made the advancement", PlainTextComponentSerializer.plainText().serialize(e.getAdvancement().getDisplay().title()));
 		var identity = Dismine.getIdentityByUuid(e.getPlayer().getUniqueId());
-		dc.sendMessage(isChallenge ? ":dart:" : ":trophy:", identity, MessageType.OTHER, "**has %s** [%s]", isChallenge ? "completed the challenge" : "made the advancement", PlainTextComponentSerializer.plainText().serialize(e.getAdvancement().getDisplay().title()));
+		DiscordStuff.sendMessage(isChallenge ? ":dart:" : ":trophy:", identity, MessageType.OTHER, "**has %s** [%s]", isChallenge ? "completed the challenge" : "made the advancement", PlainTextComponentSerializer.plainText().serialize(e.getAdvancement().getDisplay().title()));
 	}
 
 	@EventHandler
@@ -70,10 +64,10 @@ public class Events implements Listener {
 		var identity = Dismine.getIdentityByUuid(e.getPlayer().getUniqueId());
 		if(e.getMessage().startsWith("/say")) {
 			//dc.sendMessage("%s [**%s**] %s", "<:mcjava:997587410571501708>", e.getPlayer().getName(), e.getMessage().substring(4).replace("\\", "\\\\"));
-			dc.sendMessage(MessageSource.MCJAVA, identity, MessageType.SAY, e.getMessage().substring(4).replace("\\", "\\\\"));
+			DiscordStuff.sendMessage(MessageSource.MCJAVA, identity, MessageType.SAY, e.getMessage().substring(4).replace("\\", "\\\\"));
 		} else if(e.getMessage().startsWith("/me")) {
 			//dc.sendMessage("%s * **%s** %s", "<:mcjava:997587410571501708>", e.getPlayer().getName(), e.getMessage().substring(3).replace("\\", "\\\\"));
-			dc.sendMessage(MessageSource.MCJAVA, identity, MessageType.ME, e.getMessage().substring(3).replace("\\", "\\\\"));
+			DiscordStuff.sendMessage(MessageSource.MCJAVA, identity, MessageType.ME, e.getMessage().substring(3).replace("\\", "\\\\"));
 		}
 	}
 
@@ -81,10 +75,10 @@ public class Events implements Listener {
 	public void onServerCmd(ServerCommandEvent e) {
 		if(e.getCommand().startsWith("say")) {
 			//dc.sendMessage("%s [**%s**] %s", "<:mcjava:997587410571501708>", "Server", e.getCommand().substring(4).replace("\\", "\\\\"));
-			dc.sendMessage(":pager:", "Console", MessageType.SAY, e.getCommand().substring(4).replace("\\", "\\\\"));
+			DiscordStuff.sendMessage(":pager:", "Console", MessageType.SAY, e.getCommand().substring(4).replace("\\", "\\\\"));
 		} else if(e.getCommand().startsWith("me")) {
 			//dc.sendMessage("%s * **%s** %s", "<:mcjava:997587410571501708>", "Server", e.getCommand().substring(3).replace("\\", "\\\\"));
-			dc.sendMessage(":pager:", "Console", MessageType.ME, e.getCommand().substring(3).replace("\\", "\\\\"));
+			DiscordStuff.sendMessage(":pager:", "Console", MessageType.ME, e.getCommand().substring(3).replace("\\", "\\\\"));
 		}
 	}
 

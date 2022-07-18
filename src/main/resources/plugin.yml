@@ -2,6 +2,11 @@ name: Dismine
 version: '${project.version}'
 main: de.creelone.dismine.Dismine
 api-version: 1.19
+load: STARTUP
+authors: [cfp, j0code]
+website: https://github.com/creelonestudios/Dismine
+database: true
+
 commands:
   shrug:
     description: "¯\_(ツ)_/¯"

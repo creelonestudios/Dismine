@@ -1,4 +1,4 @@
-package de.creelone.dismine;
+package de.creelone.dismine.cmds;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,11 +15,11 @@ public class EmoteCommand implements CommandExecutor {
 			return true;
 		}
 		final String emote =
-				cmd.getName().equalsIgnoreCase("shrug") ? "¯\\_(ツ)_/¯"
+				cmd.getName().equalsIgnoreCase("shrug") ? "¯\\\\\\_(ツ)\\_/¯"
 						: cmd.getName().equalsIgnoreCase("tableflip") ? "(╯°□°）╯︵ ┻━┻"
 						: cmd.getName().equalsIgnoreCase("unflip") ? "┬─┬ ノ( ゜-゜ノ)"
 						: cmd.getName().equalsIgnoreCase("doubleflip") ? "┻━┻彡 ヽ(ಠ益ಠ)ノ彡┻━┻"
-						: cmd.getName().equalsIgnoreCase("owo") ? "\\(OwO)/"
+						: cmd.getName().equalsIgnoreCase("owo") ? "\\\\(OwO)/"
 						: "";
 		Player p = (Player)sender;
 		if(args.length == 0) p.chat(emote);

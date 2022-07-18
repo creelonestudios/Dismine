@@ -1,5 +1,9 @@
-package de.creelone.dismine;
+package de.creelone.dismine.cmds;
 
+import de.creelone.dismine.DiscordStuff;
+import de.creelone.dismine.Dismine;
+import de.creelone.dismine.Identity;
+import de.creelone.dismine.MySQL;
 import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
 import discord4j.core.object.component.ActionRow;
 import discord4j.core.object.component.Button;
@@ -16,20 +20,17 @@ import java.util.HashMap;
 
 public class SyncCommand implements CommandExecutor {
 
-	DiscordStuff dc;
 	public static HashMap<String, Identity> syncMap = new HashMap<>();
 
-	public SyncCommand(DiscordStuff dc) {
-		this.dc = dc;
+	public SyncCommand() {
 	}
 
 	public static void button(ButtonInteractionEvent event) {
 		if(event.getCustomId().startsWith("sync")) {
 			Identity identity = syncMap.get(event.getCustomId().substring(5));
-			Dismine.instance.identities.add(identity);
+			Dismine.identities.add(identity);
 			syncMap.remove(event.getCustomId().substring(5));
-			PreparedStatement ps = Dismine.instance.sql.prepare("INSERT INTO identities (dcid, uuid) VALUES (?, ?)");
-			try {
+			try (PreparedStatement ps = Dismine.instance.sql.prepare("INSERT INTO identities (dcid, uuid) VALUES (?, ?)")) {
 				ps.setString(1, identity.getDcid().asString());
 				ps.setString(2, identity.getUuid().toString());
 				ps.executeUpdate();
@@ -57,6 +58,7 @@ public class SyncCommand implements CommandExecutor {
 		Button syncBtn = Button.primary("disabled-sync", "Sync").disabled(true);
 		Button cancelBtn = Button.danger("disabled-notme", "Not me").disabled(true);
 
+		if (event.getMessage().isEmpty()) return;
 		event.getMessage().get().edit().withComponents(ActionRow.of(syncBtn, cancelBtn)).block();
 	}
 
@@ -73,7 +75,7 @@ public class SyncCommand implements CommandExecutor {
 		}
 
 		var tag = String.join(" ", args);
-		User user = dc.getUser(tag);
+		User user = DiscordStuff.getUser(tag);
 		if (user == null) {
 			p.sendMessage(String.format("§cUser %s not found.§r\nNote that you need to write in Discord at least once.\nUsage: /sync <discord tag>", tag));
 			return true;
@@ -82,7 +84,7 @@ public class SyncCommand implements CommandExecutor {
 		Button syncBtn = Button.primary("sync-" + p.getName() + user.getTag(), "Sync");
 		Button cancelBtn = Button.danger("notme-" + p.getName() + user.getTag(), "Not me");
 
-		dc.sendMessageTo(user, p.getName() + " requested to sync with your discord account. If you are not " + p.getName() + ", please click on [Not me]", ActionRow.of(syncBtn, cancelBtn));
+		DiscordStuff.sendMessageTo(user, p.getName() + " requested to sync with your discord account. If you are not " + p.getName() + ", please click on [Not me]", ActionRow.of(syncBtn, cancelBtn));
 
 		syncMap.put(p.getName() + user.getTag(), new Identity(user.getId(), p.getUniqueId()));
 

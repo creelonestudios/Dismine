@@ -22,9 +22,6 @@ public class SyncCommand implements CommandExecutor {
 
 	public static HashMap<String, Identity> syncMap = new HashMap<>();
 
-	public SyncCommand() {
-	}
-
 	public static void button(ButtonInteractionEvent event) {
 		if(event.getCustomId().startsWith("sync")) {
 			Identity identity = syncMap.get(event.getCustomId().substring(5));

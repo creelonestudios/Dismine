@@ -27,23 +27,25 @@ public class Config {
 		File cfgFile = new File(dismine.getDataFolder(), "config.yml");
 		try {
 			if(!cfgFile.exists()) {
-				cfgFile.mkdirs();
+				cfgFile.getParentFile().mkdirs();
 				cfgFile.createNewFile();
 				FileWriter writer = new FileWriter(cfgFile);
-				writer.write("token: \"\"\n");
-				writer.write("channels:\n");
-				writer.write("\tchat: \"\"\n");
-				writer.write("\tconsole: \"\"\n");
+				writer.write("discord: \"\"\n");
+				writer.write("  token: \"\"\n");
+				writer.write("  channels:\n");
+				writer.write("    chat: \"\"\n");
+				writer.write("    console: \"\"\n");
 				writer.write("mysql:\n");
-				writer.write("\thost: \"localhost\"\n");
-				writer.write("\tport: 3306\n");
-				writer.write("\tdb: \"dismine\"\n");
-				writer.write("\tusername: \"root\"\n");
-				writer.write("\tpassword: \"\"\n");
+				writer.write("  host: \"localhost\"\n");
+				writer.write("  port: 3306\n");
+				writer.write("  db: \"dismine\"\n");
+				writer.write("  username: \"root\"\n");
+				writer.write("  password: \"\"\n");
 				writer.close();
 			}
 		} catch (IOException e) {
 			// ¯\_(ツ)_/¯
+			e.printStackTrace();
 		}
 		var cfg = YamlConfiguration.loadConfiguration(cfgFile);
 
@@ -74,6 +76,8 @@ public class Config {
 		MYSQL_DB = cfg.getString("mysql.db");
 		MYSQL_USERNAME = cfg.getString("mysql.username");
 		MYSQL_PASSWORD = cfg.getString("mysql.password");
+
+		dismine.getLogger().log(Level.INFO, "Config loaded!");
 	}
 
 }

@@ -10,3 +10,5 @@ mysql:
   db: "dismine"
   username: "root"
   password: ""
+nick:
+  prefix: "~"

@@ -154,7 +154,7 @@ public class DiscordStuff implements Runnable {
 	public static void sendMessage(String icon, Identity identity, MessageType type, String format, Object... args) {
 		var prefix = identity.getTeamPrefixString().replaceAll("§.","");
 		var suffix = identity.getTeamSuffixString().replaceAll("§.","");
-		var name = identity.getPlayerName();
+		var name = identity.getPlayerNickname();
 
 		sendMessage(icon, prefix + name + suffix, type, String.format(format, args));
 	}

@@ -5,6 +5,8 @@ import discord4j.core.object.entity.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.scoreboard.Scoreboard;
@@ -67,10 +69,20 @@ public class Identity {
 		return Bukkit.getOfflinePlayer(uuid);
 	}
 
+	public String getPlayerNickname() {
+		var player = getPlayer();
+		if (player != null && player.isOnline()) return PlainTextComponentSerializer.plainText().serialize(player.getPlayer().displayName());
+		return this.getPlayerName();
+	}
+
 	public String getPlayerName() {
 		var player = getPlayer();
 		if (player == null) return getRandomPlaceholderName();
 		return player.getName();
+	}
+
+	public TextComponent getPlayerDisplayNickname() {
+		return Component.text("").color(getTeamColor()).append(getTeamPrefix()).append(Component.text(getPlayerNickname()).color(getTeamColor())).append(getTeamSuffix());
 	}
 
 	public TextComponent getPlayerDisplayName() {

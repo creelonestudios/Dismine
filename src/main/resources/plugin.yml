@@ -20,3 +20,5 @@ commands:
     description: "\\(OwO)/"
   sync:
     description: "Sync with your discord account"
+  nick:
+    description: "Change your nickname"

@@ -104,6 +104,7 @@ public final class Dismine extends JavaPlugin {
 		getCommand("doubleflip").setExecutor(new EmoteCommand());
 		getCommand("owo").setExecutor(new EmoteCommand());
 		getCommand("sync").setExecutor(new SyncCommand());
+		getCommand("nick").setExecutor(new NickCommand());
 		// Events
 		getServer().getPluginManager().registerEvents(new Events(), this);
 		// TPS

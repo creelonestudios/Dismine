@@ -5,6 +5,8 @@ import discord4j.core.object.entity.User;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.scoreboard.Scoreboard;
@@ -70,6 +72,8 @@ public class Identity {
 	public String getPlayerName() {
 		var player = getPlayer();
 		if (player == null) return getRandomPlaceholderName();
+		// If the player is online, return the player's current name
+		if(player.isOnline()) return PlainTextComponentSerializer.plainText().serialize(player.getPlayer().displayName());
 		return player.getName();
 	}
 

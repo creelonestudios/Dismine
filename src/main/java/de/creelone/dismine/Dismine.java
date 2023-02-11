@@ -171,7 +171,7 @@ public final class Dismine extends JavaPlugin {
 				.append(Component.newline())
 				.append(Component.text("MC Name:   ")
 						.color(TextColor.color(0xffffff)))
-				.append(identity.getPlayerDisplayName()
+				.append(identity.getRealPlayerDisplayName()
 						.colorIfAbsent(TextColor.color(0xffffff)));
 
 		var team = identity.getTeam();

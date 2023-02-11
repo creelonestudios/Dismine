@@ -72,13 +72,22 @@ public class Identity {
 	public String getPlayerName() {
 		var player = getPlayer();
 		if (player == null) return getRandomPlaceholderName();
-		// If the player is online, return the player's current name
 		if(player.isOnline()) return PlainTextComponentSerializer.plainText().serialize(player.getPlayer().displayName());
+		return player.getName();
+	}
+
+	public String getRealPlayerName() {
+		var player = getPlayer();
+		if (player == null) return getRandomPlaceholderName();
 		return player.getName();
 	}
 
 	public TextComponent getPlayerDisplayName() {
 		return Component.text("").color(getTeamColor()).append(getTeamPrefix()).append(Component.text(getPlayerName()).color(getTeamColor())).append(getTeamSuffix());
+	}
+
+	public TextComponent getRealPlayerDisplayName() {
+		return Component.text("").color(getTeamColor()).append(getTeamPrefix()).append(Component.text(getRealPlayerName()).color(getTeamColor())).append(getTeamSuffix());
 	}
 
 	public Team getTeam() {

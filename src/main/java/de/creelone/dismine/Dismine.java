@@ -47,10 +47,6 @@ public final class Dismine extends JavaPlugin {
 		// Discord
 		DiscordStuff.sendMessage(":white_check_mark: **Server started!**");
 
-		// ConsoleSneaker
-		var consneaker = new ConsoleSneaker();
-		((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).addFilter(consneaker);
-
 		// JVM Shutdown Hook
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			// Discord
@@ -88,7 +84,14 @@ public final class Dismine extends JavaPlugin {
 		// Config
 		Config.load(this);
 		instance = this;
-		DiscordStuff.login();
+
+		var consneaker = new ConsoleSneaker();
+		if(Config.DC_ENABLED) {
+			DiscordStuff.login();
+	
+			// ConsoleSneaker
+			((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).addFilter(consneaker);
+		}
 	}
 
 	@Override

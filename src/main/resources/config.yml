@@ -1,0 +1,12 @@
+discord:
+  enabled: false
+  token: ""
+  channels:
+    chat: ""
+    console: ""
+mysql:
+  host: "localhost"
+  port: 3306
+  db: "dismine"
+  username: "root"
+  password: ""

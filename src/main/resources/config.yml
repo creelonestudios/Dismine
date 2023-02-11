@@ -11,4 +11,4 @@ mysql:
   username: "root"
   password: ""
 nick:
-  prefix: "+"
+  prefix: "~"

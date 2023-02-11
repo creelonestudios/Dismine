@@ -139,7 +139,7 @@ public class Identity {
 	public String toString() {
 		var team = getTeam();
 		var teamname = team != null ? team.getName() : "";
-		return String.format("Identity{dcid:%s,uuid:%s,dcname:%s,mcname:%s,team:%s}", dcid != null ? dcid.asString() : "null", uuid != null ? uuid.toString() : "null", getTag(), getPlayerNickname(), teamname);
+		return String.format("Identity{dcid:%s,uuid:%s,dcname:%s,mcname:%s,team:%s}", dcid != null ? dcid.asString() : "null", uuid != null ? uuid.toString() : "null", getTag(), getPlayerName(), teamname);
 	}
 
 	static String getRandomPlaceholderName() {

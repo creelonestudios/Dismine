@@ -21,7 +21,7 @@ public class Events implements Listener {
 		var identity = Dismine.getIdentityByUuid(e.getPlayer().getUniqueId());
 		//dcstuff.sendMessage("<:mcjava:997587410571501708> " + e.getPlayer().getName() + ": " + e.getMessage()); identity.getPlayerDisplayName()
 		//dc.sendMessage("%s **%s:** %s", "<:mcjava:997587410571501708>", e.getPlayer().getName(), msg.replace("\\", "\\\\"));
-		var comp = Dismine.instance.createChatMsg(MessageSource.MCJAVA, identity, identity.getPlayerDisplayName(), msg);
+		var comp = Dismine.instance.createChatMsg(MessageSource.MCJAVA, identity, identity.getPlayerDisplayNickname(), msg);
 		Dismine.instance.getServer().sendMessage(comp);
 		e.setCancelled(true);
 		DiscordStuff.sendMessage(MessageSource.MCJAVA, identity, MessageType.CHAT, "%s", msg);
@@ -32,7 +32,7 @@ public class Events implements Listener {
 		//dc.sendMessage("%s **%s and lost %s XP**", ":skull:", e.getDeathMessage(), e.getPlayer().getTotalExperience() - e.getNewTotalExp());
 		var identity = Dismine.getIdentityByUuid(e.getPlayer().getUniqueId());
 		var deathMsg = e.getDeathMessage();
-		deathMsg = deathMsg.substring(identity.getTeamPrefixString().length() + identity.getPlayerName().length() + identity.getTeamSuffixString().length() + 1);
+		deathMsg = deathMsg.substring(identity.getTeamPrefixString().length() + identity.getPlayerNickname().length() + identity.getTeamSuffixString().length() + 1);
 		DiscordStuff.sendMessage(":skull:", identity, MessageType.OTHER, "**%s and lost %s XP**", deathMsg, e.getPlayer().getTotalExperience() - e.getNewTotalExp());
 	}
 

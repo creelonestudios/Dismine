@@ -69,25 +69,25 @@ public class Identity {
 		return Bukkit.getOfflinePlayer(uuid);
 	}
 
-	public String getPlayerName() {
+	public String getPlayerNickname() {
 		var player = getPlayer();
 		if (player == null) return getRandomPlaceholderName();
 		if(player.isOnline()) return PlainTextComponentSerializer.plainText().serialize(player.getPlayer().displayName());
 		return player.getName();
 	}
 
-	public String getRealPlayerName() {
+	public String getPlayerName() {
 		var player = getPlayer();
 		if (player == null) return getRandomPlaceholderName();
 		return player.getName();
 	}
 
-	public TextComponent getPlayerDisplayName() {
-		return Component.text("").color(getTeamColor()).append(getTeamPrefix()).append(Component.text(getPlayerName()).color(getTeamColor())).append(getTeamSuffix());
+	public TextComponent getPlayerDisplayNickname() {
+		return Component.text("").color(getTeamColor()).append(getTeamPrefix()).append(Component.text(getPlayerNickname()).color(getTeamColor())).append(getTeamSuffix());
 	}
 
-	public TextComponent getRealPlayerDisplayName() {
-		return Component.text("").color(getTeamColor()).append(getTeamPrefix()).append(Component.text(getRealPlayerName()).color(getTeamColor())).append(getTeamSuffix());
+	public TextComponent getPlayerDisplayName() {
+		return Component.text("").color(getTeamColor()).append(getTeamPrefix()).append(Component.text(getPlayerName()).color(getTeamColor())).append(getTeamSuffix());
 	}
 
 	public Team getTeam() {
@@ -140,7 +140,7 @@ public class Identity {
 	public String toString() {
 		var team = getTeam();
 		var teamname = team != null ? team.getName() : "";
-		return String.format("Identity{dcid:%s,uuid:%s,dcname:%s,mcname:%s,team:%s}", dcid != null ? dcid.asString() : "null", uuid != null ? uuid.toString() : "null", getTag(), getPlayerName(), teamname);
+		return String.format("Identity{dcid:%s,uuid:%s,dcname:%s,mcname:%s,team:%s}", dcid != null ? dcid.asString() : "null", uuid != null ? uuid.toString() : "null", getTag(), getPlayerNickname(), teamname);
 	}
 
 	static String getRandomPlaceholderName() {

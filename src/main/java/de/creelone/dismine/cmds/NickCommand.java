@@ -18,11 +18,13 @@ public class NickCommand implements CommandExecutor {
 		}
 		Player p = (Player)sender;
 		if(args.length == 0) {
-			p.displayName(Component.text(p.getName()));
+			p.displayName(p.name());
+			p.playerListName(p.name());
 			p.sendMessage("§aYour nickname has been reset!");
 			return true;
 		}
 		p.displayName(Component.text(args[0]));
+		p.playerListName(Component.text(args[0]));
 		p.sendMessage("§aYour nickname has been set to §e" + args[0] + "§a!");
 		return false;
 	}

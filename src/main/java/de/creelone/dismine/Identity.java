@@ -71,9 +71,8 @@ public class Identity {
 
 	public String getPlayerNickname() {
 		var player = getPlayer();
-		if (player == null) return getRandomPlaceholderName();
-		if(player.isOnline()) return PlainTextComponentSerializer.plainText().serialize(player.getPlayer().displayName());
-		return player.getName();
+		if (player != null && player.isOnline()) return PlainTextComponentSerializer.plainText().serialize(player.getPlayer().displayName());
+		return this.getPlayerName();
 	}
 
 	public String getPlayerName() {

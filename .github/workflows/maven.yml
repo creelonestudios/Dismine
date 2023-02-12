@@ -37,3 +37,17 @@ jobs:
       with:
         name: dismine-plugin
         path: target/dismine-*.jar
+    
+    - name: Upload to Modrinth
+      uses: RubixDev/modrinth-upload@v1.0.0
+      with:
+        token: ${{ secrets.MODRINTH_TOKEN }}
+        file_path: target/dismine-*.jar
+        name: Dismine commit ${{ GITHUB_SHA }}
+        version: ${{ GITHUB_SHA }}
+        changelog: ${{ github.event.head_commit.message }}
+        game_versions: 1.19,1.19.1,1.19.2,1.19.3
+        release_type: alpha
+        loaders: paper,purpur
+        featured: true
+        project_id: 4zZ6mEWQ

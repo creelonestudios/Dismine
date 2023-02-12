@@ -39,10 +39,10 @@ jobs:
         path: target/dismine-*.jar
     
     - name: Find correct JAR
-        id: findjar
-        run: |
-          output="$(find target/ -name "dismine-*.jar" -type f -printf "%f\n")"
-          echo "::set-output name=jarname::$output"
+      id: findjar
+      run: |
+        output="$(find target/ -name "dismine-*.jar" -type f -printf "%f\n")"
+        echo "::set-output name=jarname::$output"
     
     - name: Upload to Modrinth
       uses: RubixDev/modrinth-upload@v1.0.0

@@ -43,8 +43,8 @@ jobs:
       with:
         token: ${{ secrets.MODRINTH_TOKEN }}
         file_path: target/dismine-*.jar
-        name: Dismine commit ${{ GITHUB_SHA }}
-        version: ${{ GITHUB_SHA }}
+        name: Dismine commit ${{ github.sha }}
+        version: ${{ github.sha }}
         changelog: ${{ github.event.head_commit.message }}
         game_versions: 1.19,1.19.1,1.19.2,1.19.3
         release_type: alpha

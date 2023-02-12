@@ -22,3 +22,15 @@ commands:
     description: "Sync with your discord account"
   nick:
     description: "Change your nickname"
+  feed:
+    description: "Feed a player"
+  heal:
+    description: "Heal a player"
+  gm:
+    description: "Change your gamemode"
+  speed:
+    description: "Change your speed"
+  flyspeed:
+    description: "Change your flying speed"
+  walkspeed:
+    description: "Change your walking speed"

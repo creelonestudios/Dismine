@@ -38,11 +38,17 @@ jobs:
         name: dismine-plugin
         path: target/dismine-*.jar
     
+    - name: Find correct JAR
+        id: findjar
+        run: |
+          output="$(find target/ -name "dismine-*.jar" -type f -printf "%f\n")"
+          echo "::set-output name=jarname::$output"
+    
     - name: Upload to Modrinth
       uses: RubixDev/modrinth-upload@v1.0.0
       with:
         token: ${{ secrets.MODRINTH_TOKEN }}
-        file_path: target/dismine-*.jar
+        file_path: target/${{ steps.findjar.outputs.jarname }}
         name: Dismine commit ${{ github.sha }}
         version: ${{ github.sha }}
         changelog: ${{ github.event.head_commit.message }}

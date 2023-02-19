@@ -111,8 +111,19 @@ public final class Dismine extends JavaPlugin {
 		getCommand("speed").setExecutor(new SpeedCommand());
 		getCommand("flyspeed").setExecutor(new SpeedCommand());
 		getCommand("walkspeed").setExecutor(new SpeedCommand());
+		getCommand("fly").setExecutor(new FlyCommand());
+		getCommand("vanish").setExecutor(new VanishCommand());
+		getCommand("warp").setExecutor(new WarpCommand());
+		getCommand("setwarp").setExecutor(new WarpCommand());
+		getCommand("delwarp").setExecutor(new WarpCommand());
+		getCommand("home").setExecutor(new HomeCommand());
+		getCommand("homes").setExecutor(new HomeCommand());
+		getCommand("sethome").setExecutor(new HomeCommand());
+		getCommand("delhome").setExecutor(new HomeCommand());
+		getCommand("god").setExecutor(new GodCommand());
 		// Events
 		getServer().getPluginManager().registerEvents(new Events(), this);
+		getServer().getPluginManager().registerEvents(new VanishCommand(), this);
 		// TPS
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
 			double tps = getServer().getTPS()[0];

@@ -53,6 +53,7 @@ public class Events implements Listener {
 	@EventHandler
 	public void onAdvancement(PlayerAdvancementDoneEvent e) {
 		if(e.getAdvancement().getRoot().equals(e.getAdvancement())) return;
+		System.out.println(PlainTextComponentSerializer.plainText().serialize(e.message()));
 		boolean isChallenge = PlainTextComponentSerializer.plainText().serialize(e.message()).contains("completed the challenge");
 		//dc.sendMessage("%s **%s has %s** [%s]", isChallenge ? ":dart:" : ":trophy:", e.getPlayer().getName(), isChallenge ? "completed the challenge" : "made the advancement", PlainTextComponentSerializer.plainText().serialize(e.getAdvancement().getDisplay().title()));
 		var identity = Dismine.getIdentityByUuid(e.getPlayer().getUniqueId());

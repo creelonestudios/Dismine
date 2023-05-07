@@ -120,7 +120,7 @@ public final class Dismine extends JavaPlugin {
 		getCommand("homes").setExecutor(new HomeCommand());
 		getCommand("sethome").setExecutor(new HomeCommand());
 		getCommand("delhome").setExecutor(new HomeCommand());
-		getCommand("god").setExecutor(new GodCommand());
+		getCommand("godmode").setExecutor(new GodCommand());
 		// Events
 		getServer().getPluginManager().registerEvents(new Events(), this);
 		getServer().getPluginManager().registerEvents(new VanishCommand(), this);

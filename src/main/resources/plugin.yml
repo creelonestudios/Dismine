@@ -52,5 +52,6 @@ commands:
     description: "Delete a warp"
   vanish:
     description: "Toggle vanish"
-  god:
+  godmode:
     description: "Toggle god mode"
+    aliases: [godm]

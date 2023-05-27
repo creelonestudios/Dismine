@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import de.creelone.dismine.Dismine;
 
@@ -76,7 +77,8 @@ public class VanishCommand implements CommandExecutor, Listener {
 	}
 
 	@EventHandler
-	public void onPlayerJoin(Player p) {
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		Player p = e.getPlayer();
 		if(p.hasPermission("dismine.vanish.see")) return;
 		for(Player player : vanishedPlayers) {
 			p.hidePlayer(Dismine.instance, player);

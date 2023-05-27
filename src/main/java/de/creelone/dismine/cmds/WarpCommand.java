@@ -57,6 +57,9 @@ public class WarpCommand implements CommandExecutor {
 				return true;
 			}
 			if(args.length == 1) {
+				if(TeleportManager.getWarp(args[0]) != null) {
+					TeleportManager.delWarp(args[0]); // Maybe prompt the user to delete the old warp, they could still need it
+				}
 				TeleportManager.addWarp(new TeleportLocation(p.getLocation(), args[0]));
 				sender.sendMessage("§aWarp §e" + args[0] + "§a set!");
 			} else {

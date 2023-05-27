@@ -50,9 +50,15 @@ public class HomeCommand implements CommandExecutor {
 		} else if(command.getName().equalsIgnoreCase("sethome")) {
 			// /sethome [name]
 			if(args.length == 0) {
+				if(TeleportManager.getHome(p.getUniqueId(), "home") != null) {
+					TeleportManager.delHome(p.getUniqueId(), "home"); // Maybe prompt the user to delete the old home, they could still need it
+				}
 				TeleportManager.addHome(p.getUniqueId(), new TeleportLocation(p.getLocation(), "home"));
 				sender.sendMessage("§aHome set!");
 			} else if(args.length == 1) {
+				if(TeleportManager.getHome(p.getUniqueId(), args[0]) != null) {
+					TeleportManager.delHome(p.getUniqueId(), args[0]); // Maybe prompt the user to delete the old home, they could still need it
+				}
 				TeleportManager.addHome(p.getUniqueId(), new TeleportLocation(p.getLocation(), args[0]));
 				sender.sendMessage("§aHome §e" + args[0] + "§a set!");
 			} else {

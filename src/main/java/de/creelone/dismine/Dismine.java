@@ -174,6 +174,8 @@ public final class Dismine extends JavaPlugin {
 				throw new RuntimeException(e);
 			}
 		}
+		TeleportManager.initTables();
+		TeleportManager.migrateFileToSQL();
 	}
 
 	@Override

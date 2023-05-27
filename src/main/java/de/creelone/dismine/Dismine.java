@@ -1,6 +1,8 @@
 package de.creelone.dismine;
 
 import de.creelone.dismine.cmds.*;
+import de.creelone.dismine.completer.HomeTabCompleter;
+import de.creelone.dismine.completer.WarpTabCompleter;
 import discord4j.common.util.Snowflake;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -114,12 +116,16 @@ public final class Dismine extends JavaPlugin {
 		getCommand("fly").setExecutor(new FlyCommand());
 		getCommand("vanish").setExecutor(new VanishCommand());
 		getCommand("warp").setExecutor(new WarpCommand());
+		getCommand("warp").setTabCompleter(new WarpTabCompleter());
 		getCommand("setwarp").setExecutor(new WarpCommand());
 		getCommand("delwarp").setExecutor(new WarpCommand());
+		getCommand("delwarp").setTabCompleter(new WarpTabCompleter());
 		getCommand("home").setExecutor(new HomeCommand());
+		getCommand("home").setTabCompleter(new HomeTabCompleter());
 		getCommand("homes").setExecutor(new HomeCommand());
 		getCommand("sethome").setExecutor(new HomeCommand());
 		getCommand("delhome").setExecutor(new HomeCommand());
+		getCommand("delhome").setTabCompleter(new HomeTabCompleter());
 		getCommand("godmode").setExecutor(new GodCommand());
 		// Events
 		getServer().getPluginManager().registerEvents(new Events(), this);

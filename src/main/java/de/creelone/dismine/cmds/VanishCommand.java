@@ -34,15 +34,19 @@ public class VanishCommand implements CommandExecutor, Listener {
 		if(args.length == 0) {
 			if(!vanishedPlayers.contains(p)) vanishedPlayers.add(p);
 			else vanishedPlayers.remove(p);
+
 			for(Player player : p.getServer().getOnlinePlayers()) {
 				if(player.getUniqueId().equals(p.getUniqueId())) continue;
+
 				if(player.hasPermission("dismine.vanish.see")) continue;
+
 				if(!vanishedPlayers.contains(player)) {
 					player.hidePlayer(Dismine.instance, p);
 				} else {
 					player.showPlayer(Dismine.instance, p);
 				}
 			}
+
 			if(vanishedPlayers.contains(p)) {
 				p.sendMessage("§aVanish mode enabled!");
 			} else {
@@ -50,21 +54,27 @@ public class VanishCommand implements CommandExecutor, Listener {
 			}
 		} else if(args.length == 1) {
 			Player target = p.getServer().getPlayer(args[0]);
+
 			if(target == null) {
 				p.sendMessage("Player not found!");
 				return true;
 			}
+
 			if(!vanishedPlayers.contains(target)) vanishedPlayers.add(target);
 			else vanishedPlayers.remove(target);
+
 			for(Player player : p.getServer().getOnlinePlayers()) {
 				if(player.getUniqueId().equals(target.getUniqueId())) continue;
+
 				if(player.hasPermission("dismine.vanish.see")) continue;
+
 				if(!vanishedPlayers.contains(player)) {
 					player.hidePlayer(Dismine.instance, target);
 				} else {
 					player.showPlayer(Dismine.instance, target);
 				}
 			}
+
 			if(vanishedPlayers.contains(target)) {
 				p.sendMessage("§aVanish mode enabled!");
 			} else {
@@ -79,7 +89,9 @@ public class VanishCommand implements CommandExecutor, Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
+
 		if(p.hasPermission("dismine.vanish.see")) return;
+		
 		for(Player player : vanishedPlayers) {
 			p.hidePlayer(Dismine.instance, player);
 		}

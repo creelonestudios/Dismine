@@ -12,14 +12,13 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import de.creelone.dismine.util.TeleportLocation;
-import it.unimi.dsi.fastutil.Arrays;
 
 public class TeleportManager {
 
 	public static void initTables() {
 		Dismine.instance.getLogger().info("Initializing warp and home tables...");
-		Dismine.instance.sql.update("CREATE TABLE IF NOT EXISTS warps (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), world VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, PRIMARY KEY (id))");
-		Dismine.instance.sql.update("CREATE TABLE IF NOT EXISTS homes (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, owner VARCHAR(255), name VARCHAR(255), world VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT)");
+		Dismine.instance.sql.update("CREATE TABLE IF NOT EXISTS warps (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE, name VARCHAR(255), world VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, PRIMARY KEY (id))");
+		Dismine.instance.sql.update("CREATE TABLE IF NOT EXISTS homes (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE, owner VARCHAR(255), name VARCHAR(255), world VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT)");
 	}
 
 	public static void addWarp(TeleportLocation loc) {

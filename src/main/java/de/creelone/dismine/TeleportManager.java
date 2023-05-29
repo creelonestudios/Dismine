@@ -3,6 +3,7 @@ package de.creelone.dismine;
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -56,16 +57,7 @@ public class TeleportManager {
 		PreparedStatement ps = Dismine.instance.sql.prepare("SELECT * FROM warps WHERE name = ?");
 		try {
 			ps.setString(1, name);
-			ResultSet rs = ps.executeQuery();
-			if(rs.next()) {
-				World world = Dismine.instance.getServer().getWorld(rs.getString("world"));
-				double x = rs.getDouble("x");
-				double y = rs.getDouble("y");
-				double z = rs.getDouble("z");
-				float yaw = rs.getFloat("yaw");
-				float pitch = rs.getFloat("pitch");
-				return new Location(world, x, y, z, yaw, pitch);
-			}
+			return getLocFromStatement(ps);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -73,52 +65,16 @@ public class TeleportManager {
 	}
 
 	public static TeleportLocation[] getWarps() {
-		// TeleportLocation[] warps = new TeleportLocation[TeleportManager.warps.getKeys(false).size()];
-		// int i = 0;
-		// for (String key : TeleportManager.warps.getKeys(false)) {
-		// 	warps[i] = new TeleportLocation(TeleportManager.warps.getLocation(key), key);
-		// 	i++;
-		// }
-		// return warps;
 		PreparedStatement ps = Dismine.instance.sql.prepare("SELECT * FROM warps");
 		try {
-			ResultSet rs = ps.executeQuery();
-			List<TeleportLocation> warpList = new ArrayList<>();
-			int i = 0;
-			while(rs.next()) {
-				World world = Dismine.instance.getServer().getWorld(rs.getString("world"));
-				double x = rs.getDouble("x");
-				double y = rs.getDouble("y");
-				double z = rs.getDouble("z");
-				float yaw = rs.getFloat("yaw");
-				float pitch = rs.getFloat("pitch");
-
-				Location loc = new Location(world, x, y, z, yaw, pitch);
-				warpList.add(new TeleportLocation(loc, rs.getString("name")));
-				i++;
-			}
-			TeleportLocation[] warps = new TeleportLocation[warpList.size()];
-			for(int j = 0; j < warpList.size(); j++) {
-				warps[j] = (TeleportLocation) warpList.get(j);
-			}
-			return warps;
+			return getLocsFromStatement(ps);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	public static void saveWarps() {
-		// try {
-		// 	warps.save(warpsFile);
-		// } catch (Exception e) {
-		// 	e.printStackTrace();
-		// }
-	}
-
 	public static void addHome(UUID owner, TeleportLocation loc) {
-		// homes.set(owner.toString() + "." + loc.getName(), loc.getLocation());
-		// saveHomes();
 		PreparedStatement ps = Dismine.instance.sql.prepare("INSERT INTO homes (owner, name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 		try {
 			ps.setString(1, owner.toString());
@@ -136,8 +92,6 @@ public class TeleportManager {
 	}
 
 	public static void delHome(UUID owner, String name) {
-		// homes.set(owner.toString() + "." + name, null);
-		// saveHomes();
 		PreparedStatement ps = Dismine.instance.sql.prepare("DELETE FROM homes WHERE owner = ? AND name = ?");
 		try {
 			ps.setString(1, owner.toString());
@@ -149,73 +103,65 @@ public class TeleportManager {
 	}
 
 	public static Location getHome(UUID owner, String name) {
-		// return homes.getLocation(owner.toString() + "." + name);
 		PreparedStatement ps = Dismine.instance.sql.prepare("SELECT * FROM homes WHERE owner = ? AND name = ?");
 		try {
 			ps.setString(1, owner.toString());
 			ps.setString(2, name);
-			ResultSet rs = ps.executeQuery();
-			if(rs.next()) {
-				World world = Dismine.instance.getServer().getWorld(rs.getString("world"));
-				double x = rs.getDouble("x");
-				double y = rs.getDouble("y");
-				double z = rs.getDouble("z");
-				float yaw = rs.getFloat("yaw");
-				float pitch = rs.getFloat("pitch");
-
-				Location loc = new Location(world, x, y, z, yaw, pitch);
-				return loc;
-			}
+			return getLocFromStatement(ps);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private static Location getLocFromStatement(PreparedStatement ps) throws SQLException {
+		ResultSet rs = ps.executeQuery();
+		if(rs.next()) {
+			World world = Dismine.instance.getServer().getWorld(rs.getString("world"));
+			double x = rs.getDouble("x");
+			double y = rs.getDouble("y");
+			double z = rs.getDouble("z");
+			float yaw = rs.getFloat("yaw");
+			float pitch = rs.getFloat("pitch");
+
+			Location loc = new Location(world, x, y, z, yaw, pitch);
+			return loc;
 		}
 		return null;
 	}
 
 	public static TeleportLocation[] getHomes(UUID owner) {
-		// if(TeleportManager.homes.getConfigurationSection(owner.toString()) == null) return new TeleportLocation[0];
-		// TeleportLocation[] homes = new TeleportLocation[TeleportManager.homes.getConfigurationSection(owner.toString()).getKeys(false).size()];
-		// int i = 0;
-		// for (String key : TeleportManager.homes.getConfigurationSection(owner.toString()).getKeys(false)) {
-		// 	homes[i] = new TeleportLocation(TeleportManager.homes.getLocation(owner.toString() + "." + key), key);
-		// 	i++;
-		// }
-		// return homes;
 		PreparedStatement ps = Dismine.instance.sql.prepare("SELECT * FROM homes WHERE owner = ?");
 		try {
 			ps.setString(1, owner.toString());
-			ResultSet rs = ps.executeQuery();
-			List<TeleportLocation> homeList = new ArrayList<>();
-			int i = 0;
-			while(rs.next()) {
-				World world = Dismine.instance.getServer().getWorld(rs.getString("world"));
-				double x = rs.getDouble("x");
-				double y = rs.getDouble("y");
-				double z = rs.getDouble("z");
-				float yaw = rs.getFloat("yaw");
-				float pitch = rs.getFloat("pitch");
-
-				Location loc = new Location(world, x, y, z, yaw, pitch);
-				homeList.add(new TeleportLocation(loc, rs.getString("name")));
-				i++;
-			}
-			TeleportLocation[] homes = new TeleportLocation[homeList.size()];
-			for(int j = 0; j < homeList.size(); j++) {
-				homes[j] = (TeleportLocation) homeList.get(j);
-			}
-			return homes;
+			return getLocsFromStatement(ps);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	public static void saveHomes() {
-		// try {
-		// 	homes.save(homesFile);
-		// } catch (Exception e) {
-		// 	e.printStackTrace();
-		// }
+	private static TeleportLocation[] getLocsFromStatement(PreparedStatement ps) throws SQLException {
+		ResultSet rs = ps.executeQuery();
+		List<TeleportLocation> locList = new ArrayList<>();
+		int i = 0;
+		while(rs.next()) {
+			World world = Dismine.instance.getServer().getWorld(rs.getString("world"));
+			double x = rs.getDouble("x");
+			double y = rs.getDouble("y");
+			double z = rs.getDouble("z");
+			float yaw = rs.getFloat("yaw");
+			float pitch = rs.getFloat("pitch");
+
+			Location loc = new Location(world, x, y, z, yaw, pitch);
+			locList.add(new TeleportLocation(loc, rs.getString("name")));
+			i++;
+		}
+		TeleportLocation[] locs = new TeleportLocation[locList.size()];
+		for(int j = 0; j < locList.size(); j++) {
+			locs[j] = (TeleportLocation) locList.get(j);
+		}
+		return locs;
 	}
 
 	public static void migrateFileToSQL() {

@@ -34,3 +34,24 @@ commands:
     description: "Change your flying speed"
   walkspeed:
     description: "Change your walking speed"
+  fly:
+    description: "Toggle flying"
+  warp:
+    description: "Teleport to a warp"
+  home:
+    description: "Teleport to your home"
+  sethome:
+    description: "Set your home"
+  homes:
+    description: "List your homes"
+  delhome:
+    description: "Delete your home"
+  setwarp:
+    description: "Set a warp"
+  delwarp:
+    description: "Delete a warp"
+  vanish:
+    description: "Toggle vanish"
+  godmode:
+    description: "Toggle god mode"
+    aliases: [godm]

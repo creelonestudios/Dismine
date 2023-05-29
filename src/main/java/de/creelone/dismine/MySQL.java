@@ -22,8 +22,8 @@ public class MySQL {
 	public void connect() {
 		if(!isConnected()) {
 			try {
-				con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password);
-				System.out.println("[MySQL] Connected!");
+				con = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?autoReconnect=true", username, password);
+				Dismine.instance.getLogger().info("[MySQL] Connected!");
 			} catch (SQLException throwables) {
 				throwables.printStackTrace();
 			}
@@ -34,7 +34,7 @@ public class MySQL {
 		if(isConnected()) {
 			try {
 				con.close();
-				System.out.println("[MySQL] Disconnected!");
+				Dismine.instance.getLogger().info("[MySQL] Disconnected!");
 			} catch (SQLException throwables) {
 				throwables.printStackTrace();
 			}

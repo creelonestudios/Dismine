@@ -71,7 +71,7 @@ public class TeleportManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return new TeleportLocation[0];
 	}
 
 	public static void addHome(UUID owner, TeleportLocation loc) {
@@ -138,7 +138,7 @@ public class TeleportManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return new TeleportLocation[0];
 	}
 
 	private static TeleportLocation[] getLocsFromStatement(PreparedStatement ps) throws SQLException {

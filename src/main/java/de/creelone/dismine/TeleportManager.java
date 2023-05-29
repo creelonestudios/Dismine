@@ -16,15 +16,11 @@ import de.creelone.dismine.util.TeleportLocation;
 
 public class TeleportManager {
 
-	public static void initTables() {
-		Dismine.instance.getLogger().info("Initializing warp and home tables...");
-		Dismine.instance.sql.update("CREATE TABLE IF NOT EXISTS warps (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE, name VARCHAR(255), world VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, PRIMARY KEY (id))");
-		Dismine.instance.sql.update("CREATE TABLE IF NOT EXISTS homes (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE, owner VARCHAR(255), name VARCHAR(255), world VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT)");
-	}
+	//
+	// Warps
+	//
 
 	public static void addWarp(TeleportLocation loc) {
-		// warps.set(loc.getName(), loc.getLocation());
-		// saveWarps();
 		PreparedStatement ps = Dismine.instance.sql.prepare("INSERT INTO warps (name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?)");
 		try {
 			ps.setString(1, loc.getName());
@@ -41,8 +37,6 @@ public class TeleportManager {
 	}
 
 	public static void delWarp(String name) {
-		// warps.set(name, null);
-		// saveWarps();
 		PreparedStatement ps = Dismine.instance.sql.prepare("DELETE FROM warps WHERE name = ?");
 		try {
 			ps.setString(1, name);
@@ -53,7 +47,6 @@ public class TeleportManager {
 	}
 
 	public static Location getWarp(String name) {
-		// return warps.getLocation(name);
 		PreparedStatement ps = Dismine.instance.sql.prepare("SELECT * FROM warps WHERE name = ?");
 		try {
 			ps.setString(1, name);
@@ -73,6 +66,10 @@ public class TeleportManager {
 		}
 		return new TeleportLocation[0];
 	}
+
+	//
+	// Homes
+	//
 
 	public static void addHome(UUID owner, TeleportLocation loc) {
 		PreparedStatement ps = Dismine.instance.sql.prepare("INSERT INTO homes (owner, name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -114,6 +111,22 @@ public class TeleportManager {
 		return null;
 	}
 
+	
+	public static TeleportLocation[] getHomes(UUID owner) {
+		PreparedStatement ps = Dismine.instance.sql.prepare("SELECT * FROM homes WHERE owner = ?");
+		try {
+			ps.setString(1, owner.toString());
+			return getLocsFromStatement(ps);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new TeleportLocation[0];
+	}
+
+	//
+	// Utils
+	//
+
 	private static Location getLocFromStatement(PreparedStatement ps) throws SQLException {
 		ResultSet rs = ps.executeQuery();
 		if(rs.next()) {
@@ -128,17 +141,6 @@ public class TeleportManager {
 			return loc;
 		}
 		return null;
-	}
-
-	public static TeleportLocation[] getHomes(UUID owner) {
-		PreparedStatement ps = Dismine.instance.sql.prepare("SELECT * FROM homes WHERE owner = ?");
-		try {
-			ps.setString(1, owner.toString());
-			return getLocsFromStatement(ps);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new TeleportLocation[0];
 	}
 
 	private static TeleportLocation[] getLocsFromStatement(PreparedStatement ps) throws SQLException {
@@ -162,6 +164,14 @@ public class TeleportManager {
 			locs[j] = (TeleportLocation) locList.get(j);
 		}
 		return locs;
+	}
+
+	// SQL
+
+	public static void initTables() {
+		Dismine.instance.getLogger().info("Initializing warp and home tables...");
+		Dismine.instance.sql.update("CREATE TABLE IF NOT EXISTS warps (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE, name VARCHAR(255), world VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, PRIMARY KEY (id))");
+		Dismine.instance.sql.update("CREATE TABLE IF NOT EXISTS homes (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY UNIQUE, owner VARCHAR(255), name VARCHAR(255), world VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT)");
 	}
 
 	public static void migrateFileToSQL() {
